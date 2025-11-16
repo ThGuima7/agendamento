@@ -94,3 +94,44 @@ form.addEventListener("submit", function (event) {
     h.classList.remove("selected");
   });
 });
+
+// Funções de Limpeza e Exibição // 
+
+function renderScheduleForDate(date) {
+  morningList.innerHTML = "";
+  afternoonList.innerHTML = "";
+  nightList.innerHTML = "";
+
+  if (!scheduleDB[date]) return;
+
+  scheduleDB[date].forEach(item => {
+    const li = document.createElement("li");
+
+    li.innerHTML = `
+      <strong>${item.hour}</strong>
+      <span>${item.client}</span>
+      <img src="./src/assets/cancel.svg" class="cancel-icon">
+    `;
+
+    li.querySelector(".cancel-icon").addEventListener("click", () => {
+      removeAppointment(date, item.hour);
+    });
+
+    const hourNum = parseInt(item.hour.split(":")[0]);
+
+    if (hourNum >= 9 && hourNum <= 12) morningList.appendChild(li);
+    else if (hourNum >= 13 && hourNum <= 18) afternoonList.appendChild(li);
+    else nightList.appendChild(li);
+  });
+}
+
+// Remover Agendamento // 
+
+function removeAppointment(date, hour) {
+  scheduleDB[date] = scheduleDB[date].filter(
+    item => item.hour !== hour
+  );
+
+  saveDB();
+  renderScheduleForDate(date);
+}
